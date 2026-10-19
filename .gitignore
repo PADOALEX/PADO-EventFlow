@@ -1,0 +1,29 @@
+# .NET
+**/bin/
+**/obj/
+**/TestResults/
+*.user
+*.suo
+# JavaScript
+**/node_modules/
+**/dist/
+**/coverage/
+**/playwright-report/
+**/test-results/
+# Editors / OS
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# Private configuration / secrets
+.env
+.env.*
+!.env.example
+**/appsettings.Development.json
+**/appsettings.Production.json
+*.pfx
+*.pem
+*.key
+# Logs
+*.log

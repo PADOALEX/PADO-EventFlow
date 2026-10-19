@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="backend/Pado.EventFlow.Api/Pado.EventFlow.Api.csproj" />
+  <Project Path="tests/Pado.EventFlow.Api.Tests/Pado.EventFlow.Api.Tests.csproj" />
+</Solution>
