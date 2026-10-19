@@ -39,7 +39,8 @@ builder.Services.AddRateLimiter(options =>
 });
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 32 * 1024);
 var app = builder.Build();
-app.UseExceptionHandler();
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
+else app.UseExceptionHandler();
 app.UseRateLimiter();
 app.UseCors("Browser");
 
@@ -51,8 +52,12 @@ if (app.Configuration.GetValue<bool>("ApplyMigrations"))
 }
 
 var api = app.MapGroup("/api/events");
-api.MapGet("/", async Task<IResult> ([AsParameters] EventQuery q, EventDbContext db, CancellationToken ct) =>
+api.MapGet("/", async Task<IResult> (EventDbContext db, CancellationToken ct,
+    string? search = null, string? status = null, string sort = "date", string direction = "asc",
+    int page = 1, int pageSize = 10) =>
 {
+    var q = new EventQuery { Search = search, Status = status, Sort = sort,
+        Direction = direction, Page = page, PageSize = pageSize };
     var queryError = ValidateModel(q);
     if (queryError is not null) return queryError;
     IQueryable<Event> query = db.Events.AsNoTracking();
