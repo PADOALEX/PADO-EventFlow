@@ -7,15 +7,19 @@ using Pado.EventFlow.Api.Data;
 using Pado.EventFlow.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-var connection = builder.Configuration.GetConnectionString("Postgres")
-    ?? throw new InvalidOperationException("ConnectionStrings:Postgres is required.");
+// Resolve the connection at service creation time so test/deployment configuration overrides apply.
+builder.Services.AddDbContext<EventDbContext>((services, options) =>
+{
+    var connection = services.GetRequiredService<IConfiguration>().GetConnectionString("Postgres")
+        ?? throw new InvalidOperationException("ConnectionStrings:Postgres is required.");
+    options.UseNpgsql(connection);
+});
 var origins = (builder.Configuration["AllowedOrigins"] ?? "http://localhost:5173")
     .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 if (origins.Length == 0 || origins.Any(o => !Uri.TryCreate(o, UriKind.Absolute, out var uri)
                                            || uri.Scheme is not ("http" or "https") || o.Contains('*')))
     throw new InvalidOperationException("AllowedOrigins must contain explicit http(s) origins.");
 
-builder.Services.AddDbContext<EventDbContext>(options => options.UseNpgsql(connection));
 builder.Services.AddProblemDetails();
 builder.Services.AddCors(options => options.AddPolicy("Browser", policy => policy
     .WithOrigins(origins).WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
