@@ -5,7 +5,7 @@ test("create, search, complete and delete using the real API and database", asyn
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Plan events without the clutter." })).toBeVisible();
   await page.getByLabel("Event Name").fill(name);
-  await page.getByLabel("Date").fill("2026-12-05");
+  await page.getByLabel("Date", { exact: true }).fill("2026-12-05");
   await page.getByLabel("Location").fill("Lviv");
   await page.getByRole("button", { name: "Add Event" }).click();
   await page.getByPlaceholder("Search events...").fill(name);
