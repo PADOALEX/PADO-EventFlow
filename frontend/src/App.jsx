@@ -149,7 +149,7 @@ export default function App() {
         ) : (
           <>
             {refreshing && <div className="refresh-status" role="status">Refreshing events...</div>}
-            <EventTable events={events} totalEvents={totalCount} isBusy={busyEventId !== null || refreshing}
+            <EventTable events={events} totalEvents={totalCount} allEvents={stats.total} isBusy={busyEventId !== null || refreshing}
               onEdit={handleEdit} onDelete={handleDelete} onMarkCompleted={handleMarkCompleted} />
             {totalPages > 1 && <nav className="pagination" aria-label="Event pages">
               <button type="button" disabled={page === 1 || refreshing} onClick={() => setPage(page - 1)}>Previous</button>
