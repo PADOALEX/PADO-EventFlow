@@ -26,8 +26,10 @@ public sealed class EventsIntegrationTests
         var item = await created.Content.ReadFromJsonAsync<EventResponse>();
         Assert.NotNull(item);
         Assert.Equal(name, item.Name);
-        var list = await client.GetFromJsonAsync<PageResponse<EventResponse>>(
+        var listResponse = await client.GetAsync(
             "/api/events?search=" + Uri.EscapeDataString(name) + "&status=Planned&pageSize=5");
+        Assert.True(listResponse.IsSuccessStatusCode, await listResponse.Content.ReadAsStringAsync());
+        var list = await listResponse.Content.ReadFromJsonAsync<PageResponse<EventResponse>>();
         Assert.NotNull(list);
         Assert.Contains(list.Items, e => e.Id == item.Id);
         var completed = await client.PatchAsync($"/api/events/{item.Id}/complete", null);
@@ -46,7 +48,9 @@ public sealed class EventsIntegrationTests
         using var client = factory.CreateClient();
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/events",
             new UpsertEventRequest { Name = " ", Date = new DateOnly(2026, 12, 5), Location = "Lviv", Status = "Planned" })).StatusCode);
-        Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/events?pageSize=999")).StatusCode);
+        var invalidQuery = await client.GetAsync("/api/events?pageSize=999");
+        Assert.True(invalidQuery.StatusCode == HttpStatusCode.BadRequest,
+            await invalidQuery.Content.ReadAsStringAsync());
     }
 
     private sealed class EventFlowFactory(string connection) : WebApplicationFactory<Program>
