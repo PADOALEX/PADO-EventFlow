@@ -1,7 +1,7 @@
 import EventRow from "./EventRow";
 
-export default function EventTable({ events, totalEvents, isBusy, onEdit, onDelete, onMarkCompleted }) {
-  const emptyMessage = totalEvents === 0 ? "No events yet." : "No events found.";
+export default function EventTable({ events, totalEvents, allEvents, isBusy, onEdit, onDelete, onMarkCompleted }) {
+  const emptyMessage = allEvents === 0 ? "No events yet." : "No events found.";
 
   return (
     <section className="panel table-panel" aria-labelledby="eventsTableTitle">
