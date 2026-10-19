@@ -34,7 +34,7 @@ beforeEach(() => {
         page, pageSize: size, totalPages: Math.ceil(selected.length / size) });
     }
     if (pathname === "/api/events" && method === "POST") {
-      const item = { ...JSON.parse(options.body), id: crypto.randomUUID() };
+      const item = { ...JSON.parse(options.body), id: "33333333-3333-3333-3333-333333333333" };
       database.push(item);
       return json(item, 201);
     }
