@@ -50,7 +50,6 @@ jobs:
       - run: dotnet test PADO.EventFlow.slnx --configuration Release --no-build
 
   e2e:
-    # Playwright 1.56 browser dependencies support Ubuntu 24.04.
     runs-on: ubuntu-24.04
     needs: [frontend, backend]
     steps:
