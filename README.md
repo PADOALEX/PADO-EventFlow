@@ -37,6 +37,8 @@ The full audit still reports the low-severity [deepmerge prototype-poisoning adv
 
 Statistics are calculated in one PostgreSQL aggregate query so totals share one database snapshot. While an event is saving, row actions are disabled to preserve the selected edit target.
 
+The browser CI uses a version- and digest-pinned Playwright container with preinstalled Chromium and system dependencies, matching the locked test package. It reaches the real Compose application through the Linux runner's host network. Browser setup no longer depends on an Ubuntu package mirror; all three jobs have explicit time limits.
+
 ## Screenshots
 
 Captured from the running React / ASP.NET Core / PostgreSQL application on 6 November 2026 using synthetic demonstration events.
