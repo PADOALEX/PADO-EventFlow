@@ -7,9 +7,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
@@ -21,11 +26,16 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      - name: Audit production dependencies
+        run: npm audit --omit=dev
+      - name: Audit development dependencies at moderate severity and above
+        run: npm audit --audit-level=moderate
       - run: npm test -- --ci
       - run: npm run build
 
   backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     services:
       postgres:
         image: postgres:17-alpine
@@ -51,6 +61,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     needs: [frontend, backend]
     steps:
       - uses: actions/checkout@v4
@@ -62,12 +73,13 @@ jobs:
           cp .env.example .env
           docker compose up -d --build
           curl --retry 40 --retry-all-errors --retry-delay 3 --fail http://localhost:8080/health
-      - name: Install Playwright
-        run: |
-          npm install --prefix tests/e2e
-          cd tests/e2e && npx playwright install --with-deps chromium
       - name: Run browser smoke tests
-        run: cd tests/e2e && npm test
+        run: >-
+          docker run --rm --init --ipc=host --network=host
+          -e CI=true
+          -v "$PWD/tests/e2e:/work" -w /work
+          mcr.microsoft.com/playwright:v1.56.0-noble@sha256:1e83c10ccee0065f527953861d176a828a31a84324688ecb03f11912296c8444
+          /bin/bash -lc "npm ci && npm test"
       - name: Print container logs on failure
         if: failure()
         run: docker compose logs --tail=150

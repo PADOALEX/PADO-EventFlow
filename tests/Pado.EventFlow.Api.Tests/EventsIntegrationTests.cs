@@ -34,6 +34,10 @@ public sealed class EventsIntegrationTests
         Assert.Contains(list.Items, e => e.Id == item.Id);
         var completed = await client.PatchAsync($"/api/events/{item.Id}/complete", null);
         Assert.Equal(HttpStatusCode.OK, completed.StatusCode);
+        var stats = await client.GetFromJsonAsync<EventStatsResponse>("/api/events/stats");
+        Assert.NotNull(stats);
+        Assert.True(stats.Completed >= 1);
+        Assert.Equal(stats.Total, stats.Planned + stats.Completed);
         var deleted = await client.DeleteAsync($"/api/events/{item.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleted.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/events/{item.Id}")).StatusCode);

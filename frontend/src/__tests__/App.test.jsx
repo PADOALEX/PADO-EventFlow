@@ -57,6 +57,27 @@ async function fillForm(user) {
   await user.type(screen.getByLabelText("Location"), "Lutsk");
 }
 
+test("disables row actions until an event save completes", async () => {
+  const user = userEvent.setup();
+  const fetchNormally = global.fetch;
+  let finishSave;
+  global.fetch = jest.fn((url, options = {}) => {
+    if (options.method === "POST") {
+      return new Promise((resolve) => { finishSave = () => resolve(fetchNormally(url, options)); });
+    }
+    return fetchNormally(url, options);
+  });
+  render(<App />);
+  await ready();
+  await fillForm(user);
+  await user.click(screen.getByRole("button", { name: "Add Event" }));
+  for (const button of screen.getAllByRole("button", { name: "Edit" })) expect(button).toBeDisabled();
+  for (const button of screen.getAllByRole("button", { name: "Delete" })) expect(button).toBeDisabled();
+  finishSave();
+  await screen.findByText("Demo Conference");
+  await waitFor(() => expect(screen.getAllByRole("button", { name: "Edit" })[0]).toBeEnabled());
+});
+
 test("loads real API data and global stats", async () => {
   render(<App />);
   await ready();

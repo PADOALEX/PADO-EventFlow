@@ -27,6 +27,18 @@ EventFlow is a full-stack upgrade of a university React event manager. The origi
 - Tests: React Testing Library/Jest, xUnit, real-PostgreSQL API integration, Playwright browser smoke
 - Docker Compose (React served by Nginx + .NET API + PostgreSQL), migration on container startup, GitHub Actions CI
 
+## Dependency audit
+
+The frontend lockfile pins compatible `glob` 14.0.4 and `minimatch` 11.0.5 overrides for the test toolchain. CI checks production dependencies at all severities and the full dependency tree at moderate severity or higher.
+
+The full audit still reports the low-severity [deepmerge prototype-poisoning advisory](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) through Jest's development configuration dependencies. The registry's current deepmerge release remains 4.3.1, with no fixed release available at verification time. This dependency is absent from the production React bundle; a complete development-dependency clean bill is not claimed.
+
+## Consistent interactions
+
+Statistics are calculated in one PostgreSQL aggregate query so totals share one database snapshot. While an event is saving, row actions are disabled to preserve the selected edit target.
+
+The browser CI uses a version- and digest-pinned Playwright container with preinstalled Chromium and system dependencies, matching the locked test package. It reaches the real Compose application through the Linux runner's host network. Browser setup no longer depends on an Ubuntu package mirror; all three jobs have explicit time limits.
+
 ## Screenshots
 
 Captured from the running React / ASP.NET Core / PostgreSQL application on 6 November 2026 using synthetic demonstration events.
