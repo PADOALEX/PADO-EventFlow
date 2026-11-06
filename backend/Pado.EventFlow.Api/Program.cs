@@ -83,9 +83,11 @@ api.MapGet("/", async Task<IResult> (EventDbContext db, CancellationToken ct,
 });
 api.MapGet("/stats", async (EventDbContext db, CancellationToken ct) =>
 {
-    var total = await db.Events.CountAsync(ct);
-    var planned = await db.Events.CountAsync(e => e.Status == "Planned", ct);
-    return Results.Ok(new EventStatsResponse(total, planned, total - planned));
+    var stats = await db.Events.GroupBy(_ => 1)
+        .Select(group => new EventStatsResponse(group.Count(),
+            group.Count(e => e.Status == "Planned"), group.Count(e => e.Status == "Completed")))
+        .SingleOrDefaultAsync(ct);
+    return Results.Ok(stats ?? new EventStatsResponse(0, 0, 0));
 });
 api.MapGet("/{id:guid}", async Task<IResult> (Guid id, EventDbContext db, CancellationToken ct) =>
 {

@@ -29,6 +29,8 @@ EventFlow is a full-stack upgrade of a university React event manager. The origi
 
 ## Screenshots
 
+Statistics are calculated in one PostgreSQL aggregate query so totals share one database snapshot. While an event is saving, row actions are disabled to preserve the selected edit target.
+
 Captured from the running React / ASP.NET Core / PostgreSQL application on 6 November 2026 using synthetic demonstration events.
 
 ![Event workspace with persisted events](docs/screenshots/events-main.jpg)

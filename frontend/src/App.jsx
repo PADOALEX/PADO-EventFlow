@@ -25,6 +25,7 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [notification, setNotification] = useState("");
   const [busyEventId, setBusyEventId] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [reload, setReload] = useState(0);
   const firstLoad = useRef(true);
 
@@ -71,16 +72,21 @@ export default function App() {
   const handleSortChange = (value) => { setSortDirection(value); setPage(1); };
 
   async function handleSaveEvent(formEvent) {
-    if (editingEvent) {
-      await updateEvent(editingEvent.id, formEvent);
-      setEditingEvent(null);
-      showNotification("Event updated successfully!");
-    } else {
-      await createEvent(formEvent);
-      setPage(1);
-      showNotification("Event added successfully!");
+    setSaving(true);
+    try {
+      if (editingEvent) {
+        await updateEvent(editingEvent.id, formEvent);
+        setEditingEvent(null);
+        showNotification("Event updated successfully!");
+      } else {
+        await createEvent(formEvent);
+        setPage(1);
+        showNotification("Event added successfully!");
+      }
+      refresh();
+    } finally {
+      setSaving(false);
     }
-    refresh();
   }
 
   function handleEdit(event) {
@@ -149,7 +155,7 @@ export default function App() {
         ) : (
           <>
             {refreshing && <div className="refresh-status" role="status">Refreshing events...</div>}
-            <EventTable events={events} totalEvents={totalCount} allEvents={stats.total} isBusy={busyEventId !== null || refreshing}
+            <EventTable events={events} totalEvents={totalCount} allEvents={stats.total} isBusy={saving || busyEventId !== null || refreshing}
               onEdit={handleEdit} onDelete={handleDelete} onMarkCompleted={handleMarkCompleted} />
             {totalPages > 1 && <nav className="pagination" aria-label="Event pages">
               <button type="button" disabled={page === 1 || refreshing} onClick={() => setPage(page - 1)}>Previous</button>
