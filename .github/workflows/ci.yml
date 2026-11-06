@@ -50,7 +50,7 @@ jobs:
       - run: dotnet test PADO.EventFlow.slnx --configuration Release --no-build
 
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [frontend, backend]
     steps:
       - uses: actions/checkout@v4

@@ -27,6 +27,16 @@ EventFlow is a full-stack upgrade of a university React event manager. The origi
 - Tests: React Testing Library/Jest, xUnit, real-PostgreSQL API integration, Playwright browser smoke
 - Docker Compose (React served by Nginx + .NET API + PostgreSQL), migration on container startup, GitHub Actions CI
 
+## Screenshots
+
+Captured from the running React / ASP.NET Core / PostgreSQL application on 6 November 2026 using synthetic demonstration events.
+
+![Event workspace with persisted events](docs/screenshots/events-main.jpg)
+
+![Editing an existing event](docs/screenshots/events-edit.jpg)
+
+![Server-backed search result](docs/screenshots/events-filter.jpg)
+
 ## Run with Docker (recommended)
 
 Prerequisites: Docker Engine or Docker Desktop with Compose.
